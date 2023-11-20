@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chase Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+    #restartBtn {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body style="background-color: cornsilk;">  
+    <h4>way harder version, tap wherever on the screen to run away</h4>
+  <a href="last page.html">
+    <button style="background-color: blue; color: white;" align="left">it's okay just click me</button>
+  </a>
+  <canvas id="gameCanvas"></canvas>
+  <button id="restartBtn">Restart</button>
+
+
+  <script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// Set canvas dimensions to match window size
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let playerX = 30;
+let playerY = canvas.height / 2;
+let enemyX = canvas.width - 30;
+let enemyY = canvas.height / 2;
+let playerSpeed = 5;
+let originalEnemySpeed = 5; // Store the original enemy speed
+let enemySpeed = originalEnemySpeed; // Assign it as the current enemy speed
+let score = 0;
+let gameRunning = true;
+
+function drawPlayer() {
+  ctx.fillStyle = 'blue';
+  ctx.beginPath();
+  ctx.arc(playerX, playerY, 10, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawEnemy() {
+  ctx.fillStyle = 'red';
+  ctx.fillRect(enemyX - 15, enemyY - 15, 30, 30);
+}
+
+function updateScore() {
+  ctx.fillStyle = 'black';
+  ctx.font = '20px Arial';
+  ctx.fillText('Score: ' + score, 10, 30);
+}
+
+function checkCollision() {
+  const dx = playerX - enemyX;
+  const dy = playerY - enemyY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < 20) {
+    gameRunning = false;
+    clearInterval(gameLoop);
+    showRestartButton();
+  }
+}
+
+function gameLoop() {
+  if (!gameRunning) return;
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let originalEnemySpeed = 5; // Store the original enemy speed
+  let enemySpeed = originalEnemySpeed; // Assign it as the current enemy speed
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawPlayer();
+  drawEnemy();
+  updateScore();
+  checkCollision();
+  score++;
+
+  // Enemy follows the player
+  if (enemyX < playerX) enemyX += enemySpeed;
+  else if (enemyX > playerX) enemyX -= enemySpeed;
+
+  if (enemyY < playerY) enemyY += enemySpeed;
+  else if (enemyY > playerY) enemyY -= enemySpeed;
+
+  requestAnimationFrame(gameLoop);
+}
+
+canvas.addEventListener('click', handleScreenClick);
+
+function handleScreenClick(event) {
+  if (!gameRunning) return;
+  playerX = event.clientX;
+  playerY = event.clientY;
+}
+
+function showRestartButton() {
+  const restartBtn = document.getElementById('restartBtn');
+  restartBtn.style.display = 'block';
+  restartBtn.addEventListener('click', function () {
+    restartGame();
+    restartBtn.style.display = 'none';
+  });
+}
+
+function restartGame() {
+  playerX = 30;
+  playerY = canvas.height / 2;
+  enemyX = canvas.width - 30;
+  enemyY = canvas.height / 2;
+  score = 0;
+  enemySpeed = originalEnemySpeed; // Reset enemy speed
+  gameRunning = true;
+  gameLoop();
+}
+
+// Start the game loop
+gameLoop();
+
+// Adjust canvas size on window resize
+window.addEventListener('resize', function () {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+  </script>
+</body>
+</html>
